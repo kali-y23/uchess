@@ -1,0 +1,13 @@
+GameWindow {
+    background-color: #a29d99;
+}
+
+QLabel {
+    color: Black;
+}
+
+#label_status {
+    font-size: 30px;
+    padding: 5px;
+    color: #3b201a;
+}
