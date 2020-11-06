@@ -60,7 +60,9 @@ Side GameManager::whoseTurn() const {
 }
 
 Turn GameManager::makeTurn(const std::pair<int, int>& from, const std::pair<int, int>& to) {
-    if (!checkCheckWrapper(from, to).empty())
+    King *king = turn == Side::White ? white_king : black_king;
+    
+    if (!king->checkCheckWrapper(field, from, to).empty())
         return {Outcome::Invalid, nullptr};
 
     std::pair<int, int> *coords = new std::pair<int, int>(to);
@@ -77,8 +79,8 @@ Turn GameManager::makeTurn(const std::pair<int, int>& from, const std::pair<int,
     }
 
     turn = turn == Side::White ? Side::Black : Side::White;
-    King *king = turn == Side::White ? white_king : black_king;
-    std::vector<AbstractFigure *> check_figures = checkCheckWrapper(king->getCoords(), king->getCoords());
+    king = turn == Side::White ? white_king : black_king;
+    std::vector<AbstractFigure *> check_figures = king->checkCheckWrapper(field, king->getCoords(), king->getCoords());
 
     if (!check_figures.empty()) {
         if (checkMate(check_figures, king))
@@ -88,44 +90,6 @@ Turn GameManager::makeTurn(const std::pair<int, int>& from, const std::pair<int,
     }
 
     return turn_outcome;
-}
-
-std::vector<AbstractFigure *> GameManager::checkCheckWrapper(const std::pair<int, int>& from,
-                                                             const std::pair<int, int>& to) {
-    AbstractFigure *figure_from = field[from.second][from.first];
-    AbstractFigure *figure_to = field[to.second][to.first];
-    King *king = figure_from->getSide() == Side::White ? white_king : black_king;
-    std::pair<int, int> king_coords = figure_from->getType() == Type::King ? to : king->getCoords();
-
-    field[from.second][from.first] = nullptr;
-    field[to.second][to.first] = figure_from;
-
-    std::vector<AbstractFigure *> check_figures = checkCheck(king->getSide(), king_coords);
-
-    field[from.second][from.first] = figure_from;
-    field[to.second][to.first] = figure_to;
-
-    return check_figures;
-}
-
-std::vector<AbstractFigure *> GameManager::checkCheck(Side side, const std::pair<int, int>& king_coords) {
-    Turn turn;
-    std::vector<AbstractFigure *> check_figures;
-
-    for (int i = 0; i < 8; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            AbstractFigure *figure = field[i][j];
-
-            if (figure && figure->getSide() != side) {
-                turn = figure->checkMove(field, king_coords);
-
-                if (turn.outcome == Outcome::Eat)
-                    check_figures.push_back(figure);
-            }
-        }
-    }
-
-    return check_figures;
 }
 
 bool GameManager::checkMate(std::vector<AbstractFigure *> checkFigures, King *king) {
@@ -139,7 +103,7 @@ bool GameManager::checkMate(std::vector<AbstractFigure *> checkFigures, King *ki
                 continue;
             Turn turn = king->checkMove(field, to);
             if (turn.outcome == Outcome::Move || turn.outcome == Outcome::Eat) {
-                if (checkCheckWrapper(king_coords, to).empty())
+                if (king->checkCheckWrapper(field, king_coords, to).empty())
                     return false;
             }
         }
@@ -167,7 +131,7 @@ bool GameManager::checkMate(std::vector<AbstractFigure *> checkFigures, King *ki
         for (const auto& tile : defence_tiles) {
             Turn turn = figure->checkMove(field, tile);
             if (turn.outcome == Outcome::Move || turn.outcome == Outcome::Eat) {
-                if (checkCheckWrapper(figure->getCoords(), tile).empty())
+                if (king->checkCheckWrapper(field, figure->getCoords(), tile).empty())
                     return false;
             }
         }
@@ -188,3 +152,4 @@ std::pair<int, int> GameManager::chooseMoveVector(AbstractFigure *figure,
         throw std::invalid_argument("WTF chooseMoveVector with wrong figure type");
     }
 }
+

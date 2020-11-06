@@ -91,6 +91,14 @@ void GraphicsView::playerMove(QFigure *figure, const QPointF& from, const QPoint
     Side side = manager->whoseTurn();
 
     for (const auto& f : figure_list) {
+        if (turn.outcome == Outcome::Castles &&
+            f->getCoords().x() == turn.eaten->first &&
+            f->getCoords().y() == turn.eaten->second) {
+            if (f->getCoords().x() > from.x())
+                updateFigure(f, {to.x() - 1, to.y()});
+            else
+                updateFigure(f, {to.x() + 1, to.y()});
+        }
         if (turn.eaten && f->getCoords().x() == turn.eaten->first &&
             f->getCoords().y() == turn.eaten->second && 
             f->getSide() != figure->getSide()) {

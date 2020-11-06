@@ -6,7 +6,6 @@ Rook::Rook(const std::pair<int, int>& coordinates, enum Side side) : AbstractFig
 
 Turn Rook::checkMove(std::array<std::array<AbstractFigure *, 8>, 8>& field,
                         const std::pair<int, int>& coords) {
-
     if ((coords.second == m_coords.second && coords.first != m_coords.first) ||
         (coords.first == m_coords.first && coords.second != m_coords.second)) {
         if (!checkObstacles(field, makeMoveVector(coords), coords))

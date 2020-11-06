@@ -24,7 +24,8 @@ enum class Outcome {
     Check,
     Mate,
     Move,
-    Eat
+    Eat,
+    Castles
 };
 
 struct Turn {
@@ -49,8 +50,6 @@ public:
     Side getSide() const;
     Type getType() const;
     std::pair<int, int> getCoords() const;
-
-protected:
     bool checkObstacles(std::array<std::array<AbstractFigure *, 8>, 8>& field,
                         std::pair<int, int> move_vector, std::pair<int, int> coords) const;
 };

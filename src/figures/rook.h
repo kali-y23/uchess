@@ -2,8 +2,9 @@
 #include "abstractfigure.h"
 
 class Rook : public AbstractFigure {
-    bool madeTurn;
 public:
+    bool madeTurn;
+
     Rook(const std::pair<int, int>& coordinates, enum Side side);
 
     // this method is defined only for Rook for castling, other figures handle their
